@@ -1,4 +1,4 @@
-import { DeleteResult } from 'mongoose';
+import { DeleteResult, Types } from 'mongoose';
 import { DeviceLocation, IDeviceLocation } from '../db/schema.js';
 
 export async function addDeviceLocation(
@@ -8,7 +8,7 @@ export async function addDeviceLocation(
 ): Promise<IDeviceLocation | undefined> {
   try {
     return await DeviceLocation.create({
-      deviceId,
+      device: new Types.ObjectId(deviceId),
       location: {
         type: 'Point',
         coordinates: [longitude, latitude],
@@ -25,7 +25,7 @@ export async function getDeviceLocations(
   endDate?: Date,
 ) {
   try {
-    const query: any = { deviceId };
+    const query: any = { device: new Types.ObjectId(deviceId) };
 
     // Zeitraum-Filter dynamisch hinzufügen
     if (startDate || endDate) {
@@ -34,7 +34,9 @@ export async function getDeviceLocations(
       if (endDate) query.createdAt.$lte = endDate; // Kleiner oder gleich
     }
 
-    return await DeviceLocation.find(query).sort({ createdAt: 1 }).lean();
+    return await DeviceLocation.find(query)
+      .sort({ createdAt: -1 })
+      .lean();
   } catch (error) {
     console.log('error on getDeviceLocations', error);
   }
@@ -45,7 +47,7 @@ export async function deleteDeviceLocationsByDeviceId(
 ): Promise<DeleteResult | undefined> {
   try {
     return await DeviceLocation.deleteMany({
-      deviceId,
+      device: new Types.ObjectId(deviceId),
     });
   } catch (error) {
     console.log('error on deleteDeviceLocationsByDeviceId', error);

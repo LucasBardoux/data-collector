@@ -1,12 +1,9 @@
 import { z } from 'zod';
-import { Request } from 'express';
-
-const params = z.object({
-  deviceId: z.string().min(1),
-});
+import { deviceParamsSchema } from './device.js';
+import { ReducedRequest } from '../types/index.js';
 
 export const getDeviceLocationSchema = z.object({
-  params,
+  params: deviceParamsSchema,
   query: z.object({
     start: z.coerce.date(),
     end: z.coerce.date().optional(),
@@ -14,7 +11,7 @@ export const getDeviceLocationSchema = z.object({
 });
 
 export const postDeviceLocationSchema = z.object({
-  params,
+  params: deviceParamsSchema,
   body: z.object({
     longitude: z.number(),
     latitude: z.number(),
@@ -22,7 +19,7 @@ export const postDeviceLocationSchema = z.object({
 });
 
 export const deleteDeviceLocationsSchema = z.object({
-  params,
+  params: deviceParamsSchema,
 });
 
 export type GetDeviceLocationInput = z.infer<typeof getDeviceLocationSchema>;
@@ -30,8 +27,6 @@ export type PostDeviceLocationInput = z.infer<typeof postDeviceLocationSchema>;
 export type DeleteDeviceLocationsInput = z.infer<
   typeof deleteDeviceLocationsSchema
 >;
-
-type ReducedRequest = Omit<Request, 'body'>;
 
 export type GetDeviceLocationRequest = GetDeviceLocationInput & ReducedRequest;
 export type PostDeviceLocationRequest = PostDeviceLocationInput &

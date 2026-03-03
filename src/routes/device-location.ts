@@ -1,4 +1,4 @@
-import express, { Response} from 'express';
+import express, { Response } from 'express';
 import {
   addDeviceLocation,
   deleteDeviceLocationsByDeviceId,
@@ -16,6 +16,9 @@ import {
 
 const router = express.Router();
 
+// Device Routes
+
+// DeviceLocation Routes
 router.get(
   '/:deviceId',
   validateInput(getDeviceLocationSchema),
@@ -28,7 +31,7 @@ router.get(
       query.end,
     );
 
-    res.send(JSON.stringify(deviceLocations));
+    res.json(deviceLocations);
   },
 );
 
@@ -44,7 +47,7 @@ router.post(
       body.latitude,
     );
 
-    res.send(JSON.stringify(newDeviceLocation));
+    res.json(newDeviceLocation);
   },
 );
 
@@ -56,7 +59,7 @@ router.delete(
 
     const deleteResult = await deleteDeviceLocationsByDeviceId(params.deviceId);
 
-    res.send(JSON.stringify(deleteResult));
+    res.json(deleteResult);
   },
 );
 

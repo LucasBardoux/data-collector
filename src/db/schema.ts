@@ -1,7 +1,35 @@
-import { Document, Schema, model } from 'mongoose';
+import { Document, Schema, model, Types } from 'mongoose';
 
+// Device Collection
+export interface IDevice extends Document {
+  name: string;
+  type: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const deviceSchema = new Schema<IDevice>(
+  {
+    name: { type: String, required: true },
+    type: { type: String, required: true },
+  },
+  {
+    timestamps: true,
+  },
+);
+
+deviceSchema.index({
+  name: 1,
+  type: 1
+}, {
+  unique: true
+})
+
+export const Device = model<IDevice>('Device', deviceSchema);
+
+// DeviceLocation Collection mit Referenz zu Device
 export interface IDeviceLocation extends Document {
-  deviceId: string;
+  device: Types.ObjectId;
   location: {
     type: 'Point';
     coordinates: [number, number];
@@ -12,7 +40,12 @@ export interface IDeviceLocation extends Document {
 
 const deviceLocationSchema = new Schema<IDeviceLocation>(
   {
-    deviceId: { type: String, required: true, index: true },
+    device: {
+      type: Schema.Types.ObjectId,
+      ref: 'Device',
+      required: true,
+      index: true,
+    },
     location: {
       type: {
         type: String,
@@ -30,7 +63,7 @@ const deviceLocationSchema = new Schema<IDeviceLocation>(
   },
 );
 
-deviceLocationSchema.index({ deviceId: 1, createdAt: -1 });
+deviceLocationSchema.index({ device: 1, createdAt: -1 });
 deviceLocationSchema.index({ location: '2dsphere' });
 
 export const DeviceLocation = model<IDeviceLocation>(
