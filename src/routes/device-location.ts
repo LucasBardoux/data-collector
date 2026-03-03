@@ -13,10 +13,9 @@ import {
   PostDeviceLocationRequest,
   postDeviceLocationSchema,
 } from '../validation/device-location.js';
+import { requestError } from '../utils/request-error.js';
 
 const router = express.Router();
-
-// Device Routes
 
 // DeviceLocation Routes
 router.get(
@@ -25,13 +24,17 @@ router.get(
   async (req: GetDeviceLocationRequest, res: Response) => {
     const { params, query } = req;
 
-    const deviceLocations = await getDeviceLocations(
-      params.deviceId,
-      query.start,
-      query.end,
-    );
+    try {
+      const deviceLocations = await getDeviceLocations(
+        params.deviceId,
+        query.start,
+        query.end,
+      );
 
-    res.json(deviceLocations);
+      res.json(deviceLocations);
+    } catch (error) {
+      requestError(res, error);
+    }
   },
 );
 
@@ -41,13 +44,17 @@ router.post(
   async (req: PostDeviceLocationRequest, res: Response) => {
     const { params, body } = req;
 
-    const newDeviceLocation = await addDeviceLocation(
-      params.deviceId,
-      body.longitude,
-      body.latitude,
-    );
+    try {
+      const newDeviceLocation = await addDeviceLocation(
+        params.deviceId,
+        body.longitude,
+        body.latitude,
+      );
 
-    res.json(newDeviceLocation);
+      res.json(newDeviceLocation);
+    } catch (error) {
+      requestError(res, error);
+    }
   },
 );
 
@@ -56,10 +63,15 @@ router.delete(
   validateInput(deleteDeviceLocationsSchema),
   async (req: DeleteDeviceLocationsRequest, res: Response) => {
     const { params } = req;
+    try {
+      const deleteResult = await deleteDeviceLocationsByDeviceId(
+        params.deviceId,
+      );
 
-    const deleteResult = await deleteDeviceLocationsByDeviceId(params.deviceId);
-
-    res.json(deleteResult);
+      res.json(deleteResult);
+    } catch (error) {
+      requestError(res, error);
+    }
   },
 );
 

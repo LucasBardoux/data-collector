@@ -11,6 +11,7 @@ import {
   getAllDevices,
   getDevice,
 } from '../services/device.service.js';
+import { requestError } from '../utils/request-error.js';
 
 const router = express.Router();
 
@@ -20,16 +21,22 @@ router.post(
   async (req: PostDeviceRequest, res: Response) => {
     const { name, type } = req.body;
 
-    const device = await createDevice(name, type);
-
-    res.json(device);
+    try {
+      const device = await createDevice(name, type);
+      res.json(device);
+    } catch (error) {
+      requestError(res, error);
+    }
   },
 );
 
 router.get('/', async (_, res) => {
-  const devices = await getAllDevices();
-
-  res.json(devices);
+  try {
+    const devices = await getAllDevices();
+    res.json(devices);
+  } catch (error) {
+    requestError(res, error);
+  }
 });
 
 router.get(
@@ -38,9 +45,12 @@ router.get(
   async (req: GetDeviceRequest, res: Response) => {
     const { deviceId } = req.params;
 
-    const device = await getDevice(deviceId);
-
-    res.json(device);
+    try {
+      const device = await getDevice(deviceId);
+      res.json(device);
+    } catch (error) {
+      requestError(res, error);
+    }
   },
 );
 
